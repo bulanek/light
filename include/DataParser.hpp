@@ -19,6 +19,8 @@ public:
 
 	static const uint16_t DATA_SIZE = sizeof(PIR_MASK);
 
+	static const uint16_t DEFAULT_CONFIGURATION = 0b1111101010010110;
+
 
 	DataParser() :
 		m_Data(0)
@@ -112,12 +114,22 @@ public:
 		}
 	}
 
-
-
-
+	inline void SetConfigurationLight(const uint8_t confNumber)
+    {
+        if (confNumber >= 4U)
+        {
+            return;
+        }
+        for (uint8_t i = 0; i < 4; ++i)
+        {
+            SetLight(i, m_Configuration & ((1 << 4 * confNumber) << i));
+        }
+    }
 
 private:
 	uint16_t m_Data;
+	/// 4x4 bit light configuration
+	uint16_t m_Configuration;
 
 };
 

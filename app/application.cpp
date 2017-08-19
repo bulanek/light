@@ -73,6 +73,7 @@ void IRAM_ATTR InterruptPIRChange(void)
 			digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
 		}
 	}
+
 	if (pirValue == 0U)
 	{
 		f_Timer.restart();
@@ -293,7 +294,7 @@ void ready()
     }
 
     // on init all lights on.
-    f_LightsOn = f_DataParser.GetLightOn();
+    f_LightsOn = 1;
     for (uint8_t i = 0; i < LIGHTS_USED; ++i)
     {
         pinMode(PINS_LIGHT_SWITCH[i], OUTPUT);
