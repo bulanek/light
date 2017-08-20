@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>401</width>
-    <height>579</height>
+    <width>1149</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,57 +15,261 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_7">
-    <item row="1" column="0" colspan="3">
+    <item row="1" column="0" colspan="2">
      <widget class="QGroupBox" name="groupBox_4">
       <property name="title">
        <string>Luster 1</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="2" column="0">
-        <widget class="QCommandLinkButton" name="commandLinkButton">
-         <property name="text">
-          <string>SetData</string>
+       <item row="0" column="3" rowspan="2">
+        <widget class="QGroupBox" name="groupBox_7">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>Connection </string>
+          <string>Configuration</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="3" column="3">
+           <widget class="QPushButton" name="pushButton_4_3">
             <property name="text">
-             <string>IP Address:</string>
+             <string>4</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_3">
+          <item row="4" column="0">
+           <widget class="QPushButton" name="pushButton_5_1">
             <property name="text">
-             <string>Not given addr.</string>
+             <string>5</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QPushButton" name="pushButton_2_4">
+            <property name="text">
+             <string>2</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QPushButton" name="pushButton_5_3">
+            <property name="text">
+             <string>5</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="pushButton_1_4">
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QPushButton" name="pushButton_2_1">
             <property name="text">
-             <string>Socket:</string>
+             <string>2</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_4">
+          <item row="4" column="2">
+           <widget class="QPushButton" name="pushButton_5_2">
             <property name="text">
-             <string>Socket</string>
+             <string>5</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4">
+           <widget class="QPushButton" name="pushButton_5_4">
+            <property name="text">
+             <string>5</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="pushButton_3_2">
+            <property name="text">
+             <string>3</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="pushButton_2_2">
+            <property name="text">
+             <string>2</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="pushButton_1_2">
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="pushButton_1_1">
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="pushButton_2_3">
+            <property name="text">
+             <string>2</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="4">
+           <widget class="QPushButton" name="pushButton_4_4">
+            <property name="text">
+             <string>4</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="pushButton_4_1">
+            <property name="text">
+             <string>4</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QPushButton" name="pushButton_3_4">
+            <property name="text">
+             <string>3</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QPushButton" name="pushButton_4_2">
+            <property name="text">
+             <string>4</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="pushButton_1_3">
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="pushButton_3_3">
+            <property name="text">
+             <string>3</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="pushButton_3_1">
+            <property name="text">
+             <string>3</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="0" column="2" rowspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Lights</string>
@@ -97,6 +301,13 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="0">
+           <widget class="QPushButton" name="pushButton_47">
+            <property name="text">
+             <string>Light 5</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0">
            <widget class="QPushButton" name="pushButton_4">
             <property name="text">
@@ -104,6 +315,13 @@
             </property>
             <property name="checkable">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="pushButton_46">
+            <property name="text">
+             <string>Light 4</string>
             </property>
            </widget>
           </item>
@@ -130,132 +348,69 @@
          </property>
         </widget>
        </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="3">
-     <widget class="QGroupBox" name="groupBox_6">
-      <property name="title">
-       <string>Luster 2</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_6">
        <item row="2" column="0">
-        <widget class="QCommandLinkButton" name="commandLinkButton_3">
+        <widget class="QCommandLinkButton" name="commandLinkButton">
          <property name="text">
           <string>SetData</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_5">
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Connection </string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Luster:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Not given addr.</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Socket</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Socket:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>IP Address:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Lights</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QPushButton" name="pushButton_5">
-            <property name="text">
-             <string>Light 1</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_6">
-            <property name="text">
-             <string>Light 2</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="pushButton_7">
-            <property name="text">
-             <string>Light 3</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
+           <widget class="QComboBox" name="comboBox">
+            <item>
+             <property name="text">
+              <string>Chodba - dvere</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Chodba - satna</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spalna</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Obyvak</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Kuchyna</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton_9">
-         <property name="text">
-          <string>PIR On</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="pushButton_10">
-         <property name="text">
-          <string>Lights ON</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="4" column="0" colspan="3">
+    <item row="3" column="0" colspan="2">
      <widget class="QLabel" name="label_5">
       <property name="text">
        <string>Received data</string>
       </property>
      </widget>
     </item>
-    <item row="6" column="2">
+    <item row="5" column="1">
      <widget class="QCommandLinkButton" name="commandLinkButton_2">
       <property name="text">
        <string>GetData</string>

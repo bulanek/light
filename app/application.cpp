@@ -122,7 +122,7 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
     // One byte information
     if (size == DataParser::DATA_SIZE)
     {
-        f_DataParser.SetData(*(uint16_t*) data);
+        f_DataParser.SetConfData(*(ConfigurationData*) data);
 
         // Lights with lightsOn
         setLights(f_DataParser);
@@ -134,7 +134,8 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
             writeConfig(CONFIG_NAME);
         }
 
-        uint16_t data = htons(f_DataParser.GetData());
+        const ConfigurationData data = f_DataParser.GetConfData();
+        // TODO htons
 
         if (!client.send((const char*) &data, DataParser::DATA_SIZE))
         {
@@ -213,12 +214,12 @@ void writeDefaultConfig(const String& rConfigFile)
     }
     f_DataParser.SetLightOn(1U);
     f_DataParser.SetPIREnable(1U);
+    f_DataParser.SetConfiguration(DataParser::DEFAULT_CONFIGURATION);
     file_t fileDsc = fileOpen(rConfigFile,
             eFO_ReadWrite | eFO_CreateIfNotExist);
-    uint16 data = f_DataParser.GetData();
-    fileWrite(fileDsc, (void*) &data, DataParser::DATA_SIZE);
+    const ConfigurationData data = f_DataParser.GetConfData();
+    fileWrite(fileDsc, (void*) &data, sizeof(data));
     fileClose(fileDsc);
-
 }
 
 void writeConfig(const String& rConfigFile)

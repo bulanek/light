@@ -20,7 +20,6 @@ public:
     // CONSTANTS
 
     static const char*  IP_ADDRESS_1;
-    static const char*  IP_ADDRESS_2;
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -29,11 +28,9 @@ public:
 private slots:
     void on_commandLinkButton_clicked();
     void readTcp1Data(void);
-    void readTcp2Data(void);
 
     void on_commandLinkButton_2_clicked();
 
-    void on_commandLinkButton_3_clicked();
 
 private:
 
@@ -41,18 +38,19 @@ private:
 
     void SetUiData(void);
 
+    void GetConfigurationUi(void) const;
+
 
     Ui::MainWindow *ui;
-    QTcpSocket* m_TcpSocket1,* m_TcpSocket2;
-    QByteArray m_Data1, m_Data2;
+    QTcpSocket* m_TcpSocket1;
+    QByteArray m_Data1;
     static DataParser m_DataParser1;
-    static DataParser m_DataParser2;
     QPushButton* m_Light1Buttons[DataParser::NUM_LIGHT];
-    QPushButton* m_Light2Buttons[DataParser::NUM_LIGHT];
     QPushButton* m_PIREnable1;
-    QPushButton* m_PIREnable2;
     QPushButton* m_LightsOn1;
-    QPushButton* m_LightsOn2;
+
+    /// 4 configurations for 5 lights.
+    QPushButton* m_conf1Buttons[DataParser::NUM_LIGHT][DataParser::NUM_CONFIGURATIONS];
 };
 
 #endif // MAINWINDOW_H
