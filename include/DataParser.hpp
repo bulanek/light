@@ -44,7 +44,7 @@ public:
 	    m_ConfData.m_Data = data;
 	}
 
-    inline const uint16_t GetData(void) const
+    inline uint16_t GetData(void) const
 	{
 	    return m_ConfData.m_Data;
 	}

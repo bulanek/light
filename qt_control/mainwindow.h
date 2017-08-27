@@ -19,7 +19,6 @@ class MainWindow :
 public:
     // CONSTANTS
 
-    static const char*  IP_ADDRESS_1;
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -27,10 +26,12 @@ public:
 
 private slots:
     void on_commandLinkButton_clicked();
-    void readTcp1Data(void);
+    void readTcpData(void);
 
     void on_commandLinkButton_2_clicked();
 
+
+    void on_commandLinkButton_3_clicked();
 
 private:
 
@@ -42,15 +43,20 @@ private:
 
 
     Ui::MainWindow *ui;
-    QTcpSocket* m_TcpSocket1;
-    QByteArray m_Data1;
-    static DataParser m_DataParser1;
-    QPushButton* m_Light1Buttons[DataParser::NUM_LIGHT];
-    QPushButton* m_PIREnable1;
-    QPushButton* m_LightsOn1;
+    QTcpSocket* m_TcpSocket;
+    QByteArray m_Data;
+    static DataParser m_DataParser;
+    QPushButton* m_LightButtons[DataParser::NUM_LIGHT];
+    QPushButton* m_PIREnable;
+    QPushButton* m_LightsOn;
 
     /// 4 configurations for 5 lights.
-    QPushButton* m_conf1Buttons[DataParser::NUM_LIGHT][DataParser::NUM_CONFIGURATIONS];
+    QPushButton* m_confButtons[DataParser::NUM_LIGHT][DataParser::NUM_CONFIGURATIONS];
+    static const uint8_t NUM_ADDRESSES = 5U;
+    const char* IP_ADDRESSES[NUM_ADDRESSES] = {"192.168.1.173" ,"192.168.1.174" ,"192.168.1.175", "192.168.1.176","192.168.1.177"};
+    const char* ADDRESS_NAMES[NUM_ADDRESSES] = {"chodba-dvere","chodba-satna","spalna","obyvak","kuchyna"};
+    Q_STATIC_ASSERT(sizeof(IP_ADDRESSES)/sizeof(const char*) == NUM_ADDRESSES);
+    Q_STATIC_ASSERT(sizeof(ADDRESS_NAMES)/sizeof(const char*) == NUM_ADDRESSES);
 };
 
 #endif // MAINWINDOW_H
