@@ -1,7 +1,9 @@
 #ifndef DATAPARSER
 #define DATAPARSER
 #ifndef QT_CORE_LIB
-#include "user_config.h"
+    #include "user_config.h"
+#else
+    #include "qglobal.h"        // ASSERT
 #endif
 
 
@@ -10,6 +12,12 @@ typedef struct
     uint16_t m_Data;
     uint32_t m_Configuration;
 } ConfigurationData;
+
+const uint8_t CONFIGURATION_DATA_SIZE = 8U;
+
+#ifdef QT_CORE_LIB
+    Q_STATIC_ASSERT(sizeof(ConfigurationData) == CONFIGURATION_DATA_SIZE);
+#endif
 
 class DataParser{
 

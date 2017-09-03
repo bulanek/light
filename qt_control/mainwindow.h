@@ -43,7 +43,7 @@ private:
 
 
     Ui::MainWindow *ui;
-    QTcpSocket* m_TcpSocket;
+    QTcpSocket m_TcpSocket;
     QByteArray m_Data;
     static DataParser m_DataParser;
     QPushButton* m_LightButtons[DataParser::NUM_LIGHT];

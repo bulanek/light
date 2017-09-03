@@ -12,13 +12,11 @@
 
 DataParser MainWindow::m_DataParser;
 
-const uint8_t DATA_SIZE_BYTES = 2U;
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_TcpSocket(NULL)
+    m_TcpSocket(this)
 {
     ui->setupUi(this);
     for (int i = 0; i < NUM_ADDRESSES; ++i) {
@@ -65,9 +63,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::readTcpData(void)
 {
-    m_Data = m_TcpSocket->readAll();
+    m_Data = m_TcpSocket.readAll();
     // Data parser input possible
-    if (m_Data.size() == DATA_SIZE_BYTES)
+    if (m_Data.size() == CONFIGURATION_DATA_SIZE)
     {
         m_DataParser.SetData(*(uint16_t*)m_Data.data());
         this->SetUiData();
@@ -86,7 +84,7 @@ void MainWindow::on_commandLinkButton_clicked()
     this->GetUiData();
     m_DataParser.SetLightFlag(true);
     const uint16_t data = m_DataParser.GetData();
-    m_TcpSocket->write((const char*)&data, DATA_SIZE_BYTES);
+    m_TcpSocket.write((const char*)&data, CONFIGURATION_DATA_SIZE);
 }
 
 // Get data button
@@ -94,7 +92,7 @@ void MainWindow::on_commandLinkButton_2_clicked()
 {
     m_DataParser.SetLightFlag(false);
     uint16_t data = m_DataParser.GetData();
-    m_TcpSocket->write((const char*)&data, DATA_SIZE_BYTES);
+    m_TcpSocket.write((const char*)&data, CONFIGURATION_DATA_SIZE);
 }
 
 void MainWindow::GetUiData(void) const
@@ -137,17 +135,8 @@ void MainWindow::GetConfigurationUi(void) const
 
 void MainWindow::on_commandLinkButton_3_clicked()
 {
-    if (m_TcpSocket == NULL )
-    {
-        m_TcpSocket =  new (std::nothrow) QTcpSocket(this);
-    }
-    else
-    {
-        m_TcpSocket->abort();
-    }
-
     int currentIndex = ui->comboBox->currentIndex();
     Q_ASSERT(currentIndex <= NUM_ADDRESSES);
-    connect(m_TcpSocket, SIGNAL(readyRead()), SLOT(readTcpData()));
-    m_TcpSocket->connectToHost(IP_ADDRESSES[currentIndex], PORT);
+    connect(&m_TcpSocket, SIGNAL(readyRead()), SLOT(readTcpData()));
+    m_TcpSocket.connectToHost(IP_ADDRESSES[currentIndex], PORT);
 }
