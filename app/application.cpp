@@ -8,7 +8,7 @@
 
 // CONSTANTS
 
-const uint8_t PINS_LIGHT_SWITCH[] = { 13, 12, 14, 16};
+const uint8_t PINS_LIGHT_SWITCH[] = { 13, 12, 14, 16 };
 /// Number of used lights
 const uint8_t LIGHTS_USED = 3;
 
@@ -35,10 +35,9 @@ static void readConfig(const String& rConfigFile, DataParser& rDataParser);
 
 DataParser f_DataParser;
 TcpServer f_Server(tcpServerClientConnected, tcpServerClientReceive,
-		tcpServerClientComplete);
+                tcpServerClientComplete);
 /// Timer started while change of light.
 Timer f_Timer;
-
 /// All lights are on
 volatile uint16_t f_LightsOn = 1;
 
@@ -47,13 +46,14 @@ volatile uint16_t f_LightsOn = 1;
 ////////////////////////////////////////////////////////////////////////////////
 void PirOutputChangeTimerCallback(void)
 {
-	noInterrupts();
+    noInterrupts();
     f_LightsOn = 0U;
     f_DataParser.SetLightOn(0U);
-    for (uint8_t i = 0; i < LIGHTS_USED; ++i) {
+    for (uint8_t i = 0; i < LIGHTS_USED; ++i)
+    {
         digitalWrite(PINS_LIGHT_SWITCH[i], 0U);
     }
-	interrupts();
+    interrupts();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,24 +61,26 @@ void PirOutputChangeTimerCallback(void)
 ////////////////////////////////////////////////////////////////////////////////
 void IRAM_ATTR InterruptPIRChange(void)
 {
-	noInterrupts();
-	uint8_t pirValue = digitalRead(PIN_PIR_OUTPUT);
-	Serial.println("In InterruptPIRChange ");
-	f_Timer.stop();
+    noInterrupts();
+    uint8_t pirValue = digitalRead(PIN_PIR_OUTPUT);
+    Serial.println("In InterruptPIRChange ");
+    f_Timer.stop();
 
-	if ((f_LightsOn == 0U) && (pirValue == 1U) ) {
-		f_LightsOn = 1U;
-		f_DataParser.SetLightOn(1U);
-		for (uint8_t i = 0U; i < LIGHTS_USED; ++i) {
-			digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
-		}
-	}
+    if ((f_LightsOn == 0U) && (pirValue == 1U))
+    {
+        f_LightsOn = 1U;
+        f_DataParser.SetLightOn(1U);
+        for (uint8_t i = 0U; i < LIGHTS_USED; ++i)
+        {
+            digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
+        }
+    }
 
-	if (pirValue == 0U)
-	{
-		f_Timer.restart();
-	}
-	interrupts();
+    if (pirValue == 0U)
+    {
+        f_Timer.restart();
+    }
+    interrupts();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,30 +88,34 @@ void IRAM_ATTR InterruptPIRChange(void)
 ///////////////////////////////////////////////////////////////////////////////
 void IRAM_ATTR InterruptLightChange(void)
 {
-	noInterrupts();
-	Serial.println("In InterruptLightChange ");
+    noInterrupts();
+    Serial.println("In InterruptLightChange ");
     if (f_LightsOn != 0U)
     {
         f_LightsOn = 0U;
-        for (uint8_t i = 0; i < LIGHTS_USED; ++i) {
+        for (uint8_t i = 0; i < LIGHTS_USED; ++i)
+        {
             digitalWrite(PINS_LIGHT_SWITCH[i], 0U);
         }
     }
-    else {
-		f_LightsOn = 1U;
-		for (uint8_t i = 0; i < LIGHTS_USED; ++i) {
-			digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i)!=0));
-		}
-	}
+    else
+    {
+        f_LightsOn = 1U;
+        for (uint8_t i = 0; i < LIGHTS_USED; ++i)
+        {
+            digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
+        }
+    }
     f_DataParser.SetLightOn(f_LightsOn);
     interrupts();
 }
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME: tcpServerClientConnected
 ////////////////////////////////////////////////////////////////////////////////
-void tcpServerClientConnected(TcpClient* client) {
-	debugf("Application onClientCallback : %s\r\n",
-			client->getRemoteIp().toString().c_str());
+void tcpServerClientConnected(TcpClient* client)
+{
+    debugf("Application onClientCallback : %s\r\n",
+                    client->getRemoteIp().toString().c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,9 +124,9 @@ void tcpServerClientConnected(TcpClient* client) {
 bool tcpServerClientReceive(TcpClient& client, char *data, int size)
 {
     debugf("Application DataCallback : %s, %d bytes \r\n",
-            client.getRemoteIp().toString().c_str(), size);
+                    client.getRemoteIp().toString().c_str(), size);
     // One byte information
-    if (size == DataParser::DATA_SIZE)
+    if (size == CONFIGURATION_DATA_SIZE)
     {
         f_DataParser.SetConfData(*(ConfigurationData*) data);
 
@@ -129,7 +135,7 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
         // PIR enable
         setPIR(f_DataParser);
 
-        if(f_DataParser.GetLightFlag() != 0)
+        if (f_DataParser.GetLightFlag() != 0)
         {
             writeConfig(CONFIG_NAME);
         }
@@ -137,7 +143,7 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
         const ConfigurationData data = f_DataParser.GetConfData();
         // TODO htons
 
-        if (!client.send((const char*) &data, DataParser::DATA_SIZE))
+        if (!client.send((const char*) &data, CONFIGURATION_DATA_SIZE))
         {
             debugf("Failed to send response\n");
         }
@@ -159,7 +165,7 @@ void setLights(DataParser& rDataParser)
             for (uint8_t i = 0; i < LIGHTS_USED; ++i)
             {
                 digitalWrite(PINS_LIGHT_SWITCH[i],
-                        (rDataParser.GetLight(i) != 0));
+                                (rDataParser.GetLight(i) != 0));
             }
         }
         else
@@ -215,57 +221,68 @@ void writeDefaultConfig(const String& rConfigFile)
     f_DataParser.SetLightOn(1U);
     f_DataParser.SetPIREnable(1U);
     f_DataParser.SetConfiguration(DataParser::DEFAULT_CONFIGURATION);
-    file_t fileDsc = fileOpen(rConfigFile,
-            eFO_ReadWrite | eFO_CreateIfNotExist);
+    file_t fileDsc = fileOpen(rConfigFile, eFO_CreateNewAlways | eFO_WriteOnly);
     const ConfigurationData data = f_DataParser.GetConfData();
-    fileWrite(fileDsc, (void*) &data, sizeof(data));
+    fileWrite(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
     fileClose(fileDsc);
 }
 
 void writeConfig(const String& rConfigFile)
 {
-    file_t fileDsc = fileOpen(rConfigFile,
-            eFO_ReadWrite | eFO_CreateIfNotExist);
+    file_t fileDsc = 0;
+    if (fileExist(rConfigFile) == false)
+    {
+        fileDsc = fileOpen(rConfigFile, eFO_WriteOnly | eFO_CreateIfNotExist);
+    }
+    else
+    {
+        fileDsc = fileOpen(rConfigFile, eFO_WriteOnly);
+        fileSeek(fileDsc, 0, eSO_FileStart);
+    }
 
-    uint16_t data = f_DataParser.GetData();
-    fileWrite(fileDsc, (void*) &data, DataParser::DATA_SIZE);
+    const ConfigurationData data = f_DataParser.GetConfData();
+    fileWrite(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
     fileClose(fileDsc);
 }
 
 void readConfig(const String& rConfigFile, DataParser& rDataParser)
 {
-    file_t fileDsc = fileOpen(rConfigFile,
-            eFO_ReadWrite | eFO_CreateIfNotExist);
-    uint16_t data = 0;
-        fileRead(fileDsc, (void*) &data, DataParser::DATA_SIZE);
-        rDataParser.SetData(data);
+    if (fileExist(rConfigFile) == false)
+    {
+        return;
+    }
+    file_t fileDsc = fileOpen(rConfigFile, eFO_ReadOnly);
+    ConfigurationData data;
+    fileRead(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
+    rDataParser.SetConfData(data);
     fileClose(fileDsc);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME: tcpServerClientComplete
 ////////////////////////////////////////////////////////////////////////////////
-void tcpServerClientComplete(TcpClient& client, bool succesfull) {
-	debugf("Application CompleteCallback : %s \r\n",
-			client.getRemoteIp().toString().c_str());
+void tcpServerClientComplete(TcpClient& client, bool succesfull)
+{
+    debugf("Application CompleteCallback : %s \r\n",
+                    client.getRemoteIp().toString().c_str());
 }
-
 
 // Will be called when WiFi station was connected to AP
-void connectOk() {
-	debugf("I'm CONNECTED");
-	Serial.println(WifiStation.getIP().toString());
-	Serial.println("I'm CONNECTED");
-	f_Server.listen(80);
-	f_Server.setTimeOut(0xFFFF);
+void connectOk()
+{
+    debugf("I'm CONNECTED");
+    Serial.println(WifiStation.getIP().toString());
+    Serial.println("I'm CONNECTED");
+    f_Server.listen(80);
+    f_Server.setTimeOut(0xFFFF);
 }
-
 
 // Will be called when WiFi station timeout was reached
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-void connectFail() {
+void connectFail()
+{
 	debugf("I'm NOT CONNECTED!");
 	WifiStation.waitConnection(connectOk, 10, connectFail); // Repeat and check again
 }
@@ -281,7 +298,7 @@ void ready()
 
     attachInterrupt(PIN_PIR_OUTPUT, InterruptPIRChange, GPIO_PIN_INTR_ANYEDGE);
     attachInterrupt(PIN_LIGHT_INTERRUPT, InterruptLightChange,
-            GPIO_PIN_INTR_POSEDGE);
+                    GPIO_PIN_INTR_POSEDGE);
 
     file_t fileDsc;
     f_LightsOn = 1U;
@@ -317,20 +334,20 @@ void ready()
 ////////////////////////////////////////////////////////////////////////////////
 void init() {
 	f_Timer.setCallback(PirOutputChangeTimerCallback);
-	f_Timer.setIntervalMs(LIGHT_TIMEOUT_MS);
-	noInterrupts();
+    f_Timer.setIntervalMs(LIGHT_TIMEOUT_MS);
+    noInterrupts();
 
-	// Initialize wifi connection
-	Serial.begin(SERIAL_BAUD_RATE);
-	Serial.systemDebugOutput(true); // Allow debug print to serial
-	Serial.println("Sming. Let's do smart things!");
+    // Initialize wifi connection
+    Serial.begin(SERIAL_BAUD_RATE);
+    Serial.systemDebugOutput(true); // Allow debug print to serial
+    Serial.println("Sming. Let's do smart things!");
 
-	// Set system ready callback method
-	System.onReady(ready);
+    // Set system ready callback method
+    System.onReady(ready);
 
-	// Station - WiFi client
-	WifiStation.enable(true);
-	WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
+    // Station - WiFi client
+    WifiStation.enable(true);
+    WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
 
 	// Optional: Change IP addresses (and disable DHCP)
 
