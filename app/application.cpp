@@ -90,23 +90,16 @@ void IRAM_ATTR InterruptLightChange(void)
 {
     noInterrupts();
     Serial.println("In InterruptLightChange ");
-    if (f_LightsOn != 0U)
-    {
-        f_LightsOn = 0U;
-        for (uint8_t i = 0; i < LIGHTS_USED; ++i)
-        {
-            digitalWrite(PINS_LIGHT_SWITCH[i], 0U);
-        }
-    }
-    else
+    static uint8_t counterConfig = 0U;
+    f_DataParser.SetConfigurationLight(counterConfig);
+    if (f_LightsOn == 0U)
     {
         f_LightsOn = 1U;
-        for (uint8_t i = 0; i < LIGHTS_USED; ++i)
-        {
-            digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
-        }
+        f_DataParser.SetLightOn(f_LightsOn);
     }
-    f_DataParser.SetLightOn(f_LightsOn);
+    for (int i = 0; i < DataParser::NUM_LIGHT; ++i) {
+        digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
+    }
     interrupts();
 }
 ////////////////////////////////////////////////////////////////////////////////
