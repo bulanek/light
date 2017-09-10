@@ -98,7 +98,7 @@ void IRAM_ATTR InterruptLightChange(void)
         f_DataParser.SetLightOn(f_LightsOn);
     }
     for (int i = 0; i < DataParser::NUM_LIGHT; ++i) {
-        digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0));
+        digitalWrite(PINS_LIGHT_SWITCH[i], (f_DataParser.GetLight(i) != 0U));
     }
     interrupts();
 }
@@ -127,15 +127,12 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
         setLights(f_DataParser);
         // PIR enable
         setPIR(f_DataParser);
-
         if (f_DataParser.GetLightFlag() != 0)
         {
             writeConfig(CONFIG_NAME);
         }
-
         const ConfigurationData data = f_DataParser.GetConfData();
         // TODO htons
-
         if (!client.send((const char*) &data, CONFIGURATION_DATA_SIZE))
         {
             debugf("Failed to send response\n");
@@ -318,7 +315,6 @@ void ready()
 
     pinMode(PIN_PIR_OUTPUT, INPUT);
     pinMode(PIN_LIGHT_INTERRUPT, INPUT);
-
     interrupts();
 }
 
