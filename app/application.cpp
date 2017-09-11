@@ -13,25 +13,32 @@ const uint8_t PINS_LIGHT_SWITCH[] = { 13, 12, 14, 16 };
 const uint8_t LIGHTS_USED = 3;
 
 const uint8_t PIN_LIGHT_INTERRUPT = 4;
-
 const uint8_t PIN_PIR_ENABLE = 2;
 const uint8_t PIN_PIR_OUTPUT = 5;
+// TODO check the pin
+const uint8_t PIN_WIFI_ENABLE = 6U;
 
 const uint16_t LIGHT_TIMEOUT_MS = 10000U;
 
 String CONFIG_NAME = "light.conf";
+
+// FUNCTIONS
 
 void tcpServerClientConnected(TcpClient* client);
 bool tcpServerClientReceive(TcpClient& client, char *data, int size);
 void tcpServerClientComplete(TcpClient& client, bool succesfull);
 
 /// Set or get lights
-static void setLights(DataParser& rDataParser);
-static void setPIR(DataParser& rDataParser);
+static inline void setLights(DataParser& rDataParser);
+static inline void setPIR(DataParser& rDataParser);
 
 static void writeDefaultConfig(const String& rConfigFile);
 static void writeConfig(const String& rConfigFile);
 static void readConfig(const String& rConfigFile, DataParser& rDataParser);
+static inline void setupGPIO(void);
+static inline void startWifi(void);
+
+/// GLOBAL VARIABLES
 
 DataParser f_DataParser;
 TcpServer f_Server(tcpServerClientConnected, tcpServerClientReceive,
@@ -102,6 +109,7 @@ void IRAM_ATTR InterruptLightChange(void)
     }
     interrupts();
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME: tcpServerClientConnected
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,13 +293,9 @@ void connectFail()
 void ready()
 {
     debugf("READY!");
-
-    attachInterrupt(PIN_PIR_OUTPUT, InterruptPIRChange, GPIO_PIN_INTR_ANYEDGE);
-    attachInterrupt(PIN_LIGHT_INTERRUPT, InterruptLightChange,
-                    GPIO_PIN_INTR_POSEDGE);
-
-    file_t fileDsc;
     f_LightsOn = 1U;
+    setupGPIO();
+
     if (fileExist(CONFIG_NAME) == false)
     {
         writeDefaultConfig(CONFIG_NAME);
@@ -300,9 +304,19 @@ void ready()
     {
         readConfig(CONFIG_NAME, f_DataParser);
     }
+    if (digitalRead(PIN_PIR_OUTPUT) != 0U)
+    {
+        startWifi();
+    }
+    interrupts();
+}
+
+static void setupGPIO(void)
+{
+    attachInterrupt(PIN_PIR_OUTPUT, InterruptPIRChange, GPIO_PIN_INTR_ANYEDGE);
+    attachInterrupt(PIN_LIGHT_INTERRUPT, InterruptLightChange, GPIO_PIN_INTR_POSEDGE);
 
     // on init all lights on.
-    f_LightsOn = 1;
     for (uint8_t i = 0; i < LIGHTS_USED; ++i)
     {
         pinMode(PINS_LIGHT_SWITCH[i], OUTPUT);
@@ -312,10 +326,24 @@ void ready()
     // on init PIR enabled.
     pinMode(PIN_PIR_ENABLE, OUTPUT);
     digitalWrite(PIN_PIR_ENABLE, f_DataParser.GetPIREnable());
-
     pinMode(PIN_PIR_OUTPUT, INPUT);
     pinMode(PIN_LIGHT_INTERRUPT, INPUT);
-    interrupts();
+    pinMode(PIN_WIFI_ENABLE, INPUT);
+}
+
+static void startWifi(void)
+{
+    // Station - WiFi client
+    WifiStation.enable(true);
+    WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
+
+	// Optional: Change IP addresses (and disable DHCP)
+
+	WifiStation.setIP(IPAddress(String(IP_ADDRESS)));
+
+	// Run our method when station was connected to AP (or not connected)
+	// We recommend 20+ seconds at start
+	WifiStation.waitConnection(connectOk, 30, connectFail);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,16 +361,4 @@ void init() {
 
     // Set system ready callback method
     System.onReady(ready);
-
-    // Station - WiFi client
-    WifiStation.enable(true);
-    WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
-
-	// Optional: Change IP addresses (and disable DHCP)
-
-	WifiStation.setIP(IPAddress(String(IP_ADDRESS)));
-
-	// Run our method when station was connected to AP (or not connected)
-	// We recommend 20+ seconds at start
-	WifiStation.waitConnection(connectOk, 30, connectFail);
 }
