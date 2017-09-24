@@ -37,6 +37,7 @@ extern "C" {
 
 	// Beta boards
 	#define BOARD_ESP01
+    // #define ICACHE_FLASH
 
 #ifdef __cplusplus
 }

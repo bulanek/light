@@ -3,6 +3,7 @@
 
 #include "../include/DataParser.hpp"
 #include "../include/Definitions.h"
+#include "spi_flash.h"
 
 // If you want, you can define WiFi settings globally in Eclipse Environment Variables
 
@@ -16,11 +17,13 @@ const uint8_t PIN_LIGHT_INTERRUPT = 4;
 const uint8_t PIN_PIR_ENABLE = 2;
 const uint8_t PIN_PIR_OUTPUT = 5;
 // TODO check the pin
-const uint8_t PIN_WIFI_ENABLE = 6U;
+const uint8_t PIN_WIFI_ENABLE = 1;
 
 const uint16_t LIGHT_TIMEOUT_MS = 10000U;
 
-String CONFIG_NAME = "light.conf";
+const String CONFIG_NAME  = "light.conf";
+
+const uint32_t CONFIGURATION_DATA_ADDRESS = 0xC0000;
 
 // FUNCTIONS
 
@@ -32,11 +35,16 @@ void tcpServerClientComplete(TcpClient& client, bool succesfull);
 static inline void setLights(DataParser& rDataParser);
 static inline void setPIR(DataParser& rDataParser);
 
-static void writeDefaultConfig(const String& rConfigFile);
-static void writeConfig(const String& rConfigFile);
-static void readConfig(const String& rConfigFile, DataParser& rDataParser);
+static void writeDefaultConfig(DataParser& rDataParser);
+
+// Will be called when WiFi hardware and software initialization was finished
+// And system initialization was completed
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+void ready(void);
 static inline void setupGPIO(void);
-static inline void startWifi(void);
+static inline void setupWifi(void);
 
 /// GLOBAL VARIABLES
 
@@ -117,6 +125,13 @@ void tcpServerClientConnected(TcpClient* client)
 {
     debugf("Application onClientCallback : %s\r\n",
                     client->getRemoteIp().toString().c_str());
+
+    char message[] = "Connected to IP_ADDRESS";
+    if(!client->send(message, sizeof(message)))
+    {
+        debugf("failed to response on connection");
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,11 +150,13 @@ bool tcpServerClientReceive(TcpClient& client, char *data, int size)
         setLights(f_DataParser);
         // PIR enable
         setPIR(f_DataParser);
+        const ConfigurationData data = f_DataParser.GetConfData();
+
         if (f_DataParser.GetLightFlag() != 0)
         {
-            writeConfig(CONFIG_NAME);
+            spi_flash_write(CONFIGURATION_DATA_ADDRESS, (uint32_t*) &data,
+                            CONFIGURATION_DATA_SIZE);
         }
-        const ConfigurationData data = f_DataParser.GetConfData();
         // TODO htons
         if (!client.send((const char*) &data, CONFIGURATION_DATA_SIZE))
         {
@@ -210,51 +227,19 @@ void setPIR(DataParser& rDataParser)
     }
 }
 
-void writeDefaultConfig(const String& rConfigFile)
+void writeDefaultConfig(DataParser& rDataParser)
 {
     for (uint8_t i = 0; i < DataParser::NUM_LIGHT; ++i)
     {
-        f_DataParser.SetLight(i, 1);
+        rDataParser.SetLight(i, 1);
     }
-    f_DataParser.SetLightOn(1U);
-    f_DataParser.SetPIREnable(1U);
-    f_DataParser.SetConfiguration(DataParser::DEFAULT_CONFIGURATION);
-    file_t fileDsc = fileOpen(rConfigFile, eFO_CreateNewAlways | eFO_WriteOnly);
-    const ConfigurationData data = f_DataParser.GetConfData();
-    fileWrite(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
-    fileClose(fileDsc);
+    rDataParser.SetLightOn(1U);
+    rDataParser.SetPIREnable(1U);
+    rDataParser.SetConfiguration(DataParser::DEFAULT_CONFIGURATION);
 }
 
-void writeConfig(const String& rConfigFile)
-{
-    file_t fileDsc = 0;
-    if (fileExist(rConfigFile) == false)
-    {
-        fileDsc = fileOpen(rConfigFile, eFO_WriteOnly | eFO_CreateIfNotExist);
-    }
-    else
-    {
-        fileDsc = fileOpen(rConfigFile, eFO_WriteOnly);
-        fileSeek(fileDsc, 0, eSO_FileStart);
-    }
 
-    const ConfigurationData data = f_DataParser.GetConfData();
-    fileWrite(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
-    fileClose(fileDsc);
-}
 
-void readConfig(const String& rConfigFile, DataParser& rDataParser)
-{
-    if (fileExist(rConfigFile) == false)
-    {
-        return;
-    }
-    file_t fileDsc = fileOpen(rConfigFile, eFO_ReadOnly);
-    ConfigurationData data;
-    fileRead(fileDsc, (void*) &data, CONFIGURATION_DATA_SIZE);
-    rDataParser.SetConfData(data);
-    fileClose(fileDsc);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTION NAME: tcpServerClientComplete
@@ -266,10 +251,10 @@ void tcpServerClientComplete(TcpClient& client, bool succesfull)
 }
 
 // Will be called when WiFi station was connected to AP
-void connectOk()
+void gotIP(IPAddress address, IPAddress, IPAddress)
 {
     debugf("I'm CONNECTED");
-    Serial.println(WifiStation.getIP().toString());
+    Serial.println(address.toString());
     Serial.println("I'm CONNECTED");
     f_Server.listen(80);
     f_Server.setTimeOut(0xFFFF);
@@ -279,37 +264,82 @@ void connectOk()
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-void connectFail()
+void connectFail(String, uint8_t, uint8_t[6], uint8_t)
 {
 	debugf("I'm NOT CONNECTED!");
-	WifiStation.waitConnection(connectOk, 10, connectFail); // Repeat and check again
 }
 
-// Will be called when WiFi hardware and software initialization was finished
-// And system initialization was completed
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-void ready()
-{
-    debugf("READY!");
-    f_LightsOn = 1U;
-    setupGPIO();
+void init() {
+    noInterrupts();
 
-    if (fileExist(CONFIG_NAME) == false)
+	f_Timer.setCallback(PirOutputChangeTimerCallback);
+    f_Timer.setIntervalMs(LIGHT_TIMEOUT_MS);
+
+    // Initialize wifi connection
+    Serial.begin(SERIAL_BAUD_RATE);
+    Serial.systemDebugOutput(true); // Allow debug print to serial
+    Serial.println("Sming. Let's do smart things!");
+
+
+    setupGPIO();
+    setupWifi() ;
+
+    // Set system ready callback method
+    System.onReady(ready);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+void ready(void)
+{
+    f_LightsOn = 1U;
+
+    ConfigurationData confData;
+
+    SpiFlashOpResult flashResult = spi_flash_read(CONFIGURATION_DATA_ADDRESS,
+                    (uint32_t*) &confData, CONFIGURATION_DATA_SIZE);
+    if ((flashResult == SPI_FLASH_RESULT_OK)
+                    && (confData.m_Identification == IDENTIFICATION_ID))
     {
-        writeDefaultConfig(CONFIG_NAME);
+       debugf("Read flash ok\r\n");
+       f_DataParser.SetConfData(confData);
+    }
+    else if ((flashResult == SPI_FLASH_RESULT_OK) && (confData.m_Identification != IDENTIFICATION_ID))
+    {
+        debugf("First time read flash, id on flash: %i\r\n",
+                        confData.m_Identification);
+        writeDefaultConfig(f_DataParser);
+        flashResult = spi_flash_write(CONFIGURATION_DATA_ADDRESS,
+                        (uint32_t*) &f_DataParser.GetConfData(),
+                        CONFIGURATION_DATA_SIZE);
+        if (flashResult != SPI_FLASH_RESULT_OK)
+        {
+            debugf("spi_flash_write failed, %i\r\n", flashResult);
+            assert(false);
+        }
+        else
+        {
+            debugf("Write on flash, configuration : %i\r\n",
+                            f_DataParser.GetConfData().m_Configuration);
+        }
     }
     else
     {
-        readConfig(CONFIG_NAME, f_DataParser);
-    }
-    if (digitalRead(PIN_PIR_OUTPUT) != 0U)
-    {
-        startWifi();
+        debugf("Error occured, flashResult: %i(ok = %i), identification: %i\r\n",
+                        flashResult, SPI_FLASH_RESULT_OK,
+                        confData.m_Identification);
+        assert(false);
     }
     interrupts();
 }
+
+
 
 static void setupGPIO(void)
 {
@@ -328,37 +358,21 @@ static void setupGPIO(void)
     digitalWrite(PIN_PIR_ENABLE, f_DataParser.GetPIREnable());
     pinMode(PIN_PIR_OUTPUT, INPUT);
     pinMode(PIN_LIGHT_INTERRUPT, INPUT);
-    pinMode(PIN_WIFI_ENABLE, INPUT);
+//    pinMode(PIN_WIFI_ENABLE, INPUT | FUNCTION_3);
 }
 
-static void startWifi(void)
+
+static void setupWifi(void)
 {
-    // Station - WiFi client
-    WifiStation.enable(true);
+    debugf("Start Wifi\r\n");
     WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
 
 	// Optional: Change IP addresses (and disable DHCP)
 
+
 	WifiStation.setIP(IPAddress(String(IP_ADDRESS)));
+	WifiEvents.onStationGotIP(gotIP);
+	WifiEvents.onStationDisconnect(connectFail);
+    WifiStation.enable(true);
 
-	// Run our method when station was connected to AP (or not connected)
-	// We recommend 20+ seconds at start
-	WifiStation.waitConnection(connectOk, 30, connectFail);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//
-////////////////////////////////////////////////////////////////////////////////
-void init() {
-	f_Timer.setCallback(PirOutputChangeTimerCallback);
-    f_Timer.setIntervalMs(LIGHT_TIMEOUT_MS);
-    noInterrupts();
-
-    // Initialize wifi connection
-    Serial.begin(SERIAL_BAUD_RATE);
-    Serial.systemDebugOutput(true); // Allow debug print to serial
-    Serial.println("Sming. Let's do smart things!");
-
-    // Set system ready callback method
-    System.onReady(ready);
 }

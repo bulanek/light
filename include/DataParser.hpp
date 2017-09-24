@@ -6,14 +6,16 @@
     #include "qglobal.h"        // ASSERT
 #endif
 
+const uint8_t CONFIGURATION_DATA_SIZE = 8U;
+const uint16_t IDENTIFICATION_ID = 0xFF00;
 
 typedef struct
 {
+    uint16_t m_Identification = IDENTIFICATION_ID;
     uint16_t m_Data;
     uint32_t m_Configuration;
 } ConfigurationData;
 
-const uint8_t CONFIGURATION_DATA_SIZE = 8U;
 
 #ifdef QT_CORE_LIB
     Q_STATIC_ASSERT(sizeof(ConfigurationData) == CONFIGURATION_DATA_SIZE);

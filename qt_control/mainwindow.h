@@ -53,7 +53,7 @@ private:
     /// 4 configurations for 5 lights.
     QPushButton* m_confButtons[DataParser::NUM_LIGHT][DataParser::NUM_CONFIGURATIONS];
     static const uint8_t NUM_ADDRESSES = 5U;
-    const char* IP_ADDRESSES[NUM_ADDRESSES] = {"192.168.1.173" ,"192.168.1.174" ,"192.168.1.175", "192.168.1.176","192.168.1.177"};
+    const char* IP_ADDRESSES[NUM_ADDRESSES] = {"192.168.1.18" ,"192.168.1.174" ,"192.168.1.175", "192.168.1.176","192.168.1.177"};
     const char* ADDRESS_NAMES[NUM_ADDRESSES] = {"chodba-dvere","chodba-satna","spalna","obyvak","kuchyna"};
     Q_STATIC_ASSERT(sizeof(IP_ADDRESSES)/sizeof(const char*) == NUM_ADDRESSES);
     Q_STATIC_ASSERT(sizeof(ADDRESS_NAMES)/sizeof(const char*) == NUM_ADDRESSES);
