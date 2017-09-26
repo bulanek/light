@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_PIREnable = ui->pushButton;
 
     m_LightsOn = ui->pushButton_8;
+    connect(&m_TcpSocket, SIGNAL(readyRead()), SLOT(readTcpData()));
+    connect(&m_TcpSocket, SIGNAL(connected()), SLOT(connectedTCP()));
 }
 
 MainWindow::~MainWindow()
@@ -76,6 +78,25 @@ void MainWindow::readTcpData(void)
 
     }
     ui->label_5->setText(QString(m_Data.data()));
+}
+
+void MainWindow::connectedTCP(void)
+{
+    QString textInput = "Connected";
+    ui->label_2->setText(textInput);
+    ui->commandLinkButton_2->setEnabled(true);
+    ui->commandLinkButton_3->setEnabled(true);
+}
+
+void MainWindow::socketStateChanged(QAbstractSocket::SocketState socketState)
+{
+    if (socketState == QAbstractSocket::UnconnectedState)
+    {
+        QString textInput = "Disconnected";
+        ui->label_2->setText(textInput);
+        ui->commandLinkButton_2->setEnabled(false);
+        ui->commandLinkButton_3->setEnabled(false);
+    }
 }
 
 // Set Data1 button
@@ -112,12 +133,9 @@ void MainWindow::SetUiData(void)
         m_LightButtons[i]->setChecked(m_DataParser.GetLight(i) != 0);
     }
     std::printf("PirEnable %i\n", m_DataParser.GetPIREnable());
-
     m_PIREnable->setChecked(m_DataParser.GetPIREnable() != 0);
-
     m_LightsOn->setChecked(m_DataParser.GetLightOn() != 0);
 }
-
 
 void MainWindow::GetConfigurationUi(void) const
 {
@@ -137,6 +155,10 @@ void MainWindow::on_commandLinkButton_3_clicked()
 {
     int currentIndex = ui->comboBox->currentIndex();
     Q_ASSERT(currentIndex <= NUM_ADDRESSES);
-    connect(&m_TcpSocket, SIGNAL(readyRead()), SLOT(readTcpData()));
+    if (m_TcpSocket.isOpen())
+    {
+        m_TcpSocket.abort();
+    }
     m_TcpSocket.connectToHost(IP_ADDRESSES[currentIndex], PORT);
+
 }

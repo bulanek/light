@@ -27,6 +27,8 @@ public:
 private slots:
     void on_commandLinkButton_clicked();
     void readTcpData(void);
+    void connectedTCP(void);
+    void socketStateChanged(QAbstractSocket::SocketState socketState);
 
     void on_commandLinkButton_2_clicked();
 

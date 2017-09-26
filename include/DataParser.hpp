@@ -5,6 +5,7 @@
 #else
     #include "qglobal.h"        // ASSERT
 #endif
+#include <cstdint>
 
 const uint8_t CONFIGURATION_DATA_SIZE = 8U;
 const uint16_t IDENTIFICATION_ID = 0xFF00;
@@ -27,16 +28,11 @@ public:
 
     static const uint8_t NUM_LIGHT = 5U;
 	static const uint16_t LIGHT_SET_MASK = 0x20;
-
 	static const uint16_t LIGHT_MASK = 0x1F;
 	static const uint16_t LIGHT_ON_MASK = 0x40;
-
 	static const uint16_t PIR_MASK = 0x100;
-
 	static const uint16_t DATA_SIZE = sizeof(PIR_MASK);
-
     static const uint32_t DEFAULT_CONFIGURATION = 0b1111101010010110;
-
     static const uint8_t  NUM_CONFIGURATIONS = 4U;
 
 

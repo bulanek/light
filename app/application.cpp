@@ -131,7 +131,12 @@ void tcpServerClientConnected(TcpClient* client)
     {
         debugf("failed to response on connection");
     }
+    const ConfigurationData data = f_DataParser.GetConfData();
 
+    if (!client.send((const char*) &data, CONFIGURATION_DATA_SIZE))
+    {
+        debugf("Failed to send connection response\n");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,19 +243,13 @@ void writeDefaultConfig(DataParser& rDataParser)
     rDataParser.SetConfiguration(DataParser::DEFAULT_CONFIGURATION);
 }
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FUNCTION NAME: tcpServerClientComplete
-////////////////////////////////////////////////////////////////////////////////
 void tcpServerClientComplete(TcpClient& client, bool succesfull)
 {
     debugf("Application CompleteCallback : %s \r\n",
                     client.getRemoteIp().toString().c_str());
 }
 
-// Will be called when WiFi station was connected to AP
+
 void gotIP(IPAddress address, IPAddress, IPAddress)
 {
     debugf("I'm CONNECTED");
@@ -368,7 +367,6 @@ static void setupWifi(void)
     WifiStation.config(WIFI_SSID, WIFI_PWD); // Put you SSID and Password here
 
 	// Optional: Change IP addresses (and disable DHCP)
-
 
 	WifiStation.setIP(IPAddress(String(IP_ADDRESS)));
 	WifiEvents.onStationGotIP(gotIP);

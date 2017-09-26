@@ -31,3 +31,4 @@ HEADERS  += mainwindow.h \
     ../include/Definitions.h
 
 FORMS    += mainwindow.ui
+CONFIG += c++11
