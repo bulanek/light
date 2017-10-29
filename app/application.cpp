@@ -133,7 +133,7 @@ void tcpServerClientConnected(TcpClient* client)
     }
     const ConfigurationData data = f_DataParser.GetConfData();
 
-    if (!client.send((const char*) &data, CONFIGURATION_DATA_SIZE))
+    if (!client->send((const char*) &data, CONFIGURATION_DATA_SIZE))
     {
         debugf("Failed to send connection response\n");
     }
